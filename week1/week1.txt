@@ -1,0 +1,3 @@
+week1 
+
+iris data 를 이용해  DT, RF, SVM, LR 분류를 각각 수행하기
