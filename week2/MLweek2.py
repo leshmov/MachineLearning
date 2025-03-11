@@ -27,7 +27,7 @@ models = {
     "Decision Tree": DecisionTreeClassifier(),
     "Random Forest": RandomForestClassifier(),
     "Support Vector Machine": SVC(),
-    "Logistic Regression": LogisticRegression(solver='lbfgs', max_iter=5000)
+    "Logistic Regression": LogisticRegression(solver='saga', max_iter=10000) #1000으로 하니까 오류뜸
 }
 
 # 6. 모델 학습 및 평가
