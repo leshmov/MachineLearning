@@ -19,10 +19,11 @@ encoder = LabelEncoder()
 for column in local_df.columns:
     local_df[column] = encoder.fit_transform(local_df[column])
 
-#필요 특성
-ft=['id','Sex','Length','Diameter','Height','Whole_weight','Shucked_weight','Viscera_weight','Shell_weight']
 #타겟
 tg='Rings'
+#필요 특성(특성 자동 계산 ud 2025-03-23)
+ft=[col for col in local_df.columns if col != tg]
+# ft=['id','Sex','Length','Diameter','Height','Whole_weight','Shucked_weight','Viscera_weight','Shell_weight']
 
 x=local_df[ft]
 y=local_df[tg]
