@@ -38,34 +38,27 @@ print("after one hot")
 print(Y[:5])        # .head() 대신 슬라이싱하기
 print("Y.shape:", Y.shape)
 
-X_train,X_test, y_train,y_test = train_test_split(X,Y,test_size=0.2,random_state=0)
+X_train,X_test, y_train,y_test = train_test_split(X,Y,test_size=0.2,random_state=40)
 
 model = Sequential() # 모델 시퀀셜
 
-model.add(Dense(10,input_shape=(13,),activation='relu')) # 특징이 13개 이므로 input_shape 에 13개 넣기 
+model.add(Dense(16,input_shape=(13,),activation='relu')) # 특징이 13개 이므로 input_shape 에 13개 넣기 
 
-model.add(Dense(50,activation='relu'))
-
-model.add(Dense(100,activation='relu'))
-
-# model.add(Dense(200,activation='relu'))
-
-# model.add(Dense(200,activation='relu'))
-# 200 까지 가니까 overfitting 발생 
-
-model.add(Dense(100,activation='relu'))
-
-model.add(Dense(50,activation='relu'))
-
-model.add(Dense(20,activation='relu'))
+model.add(Dense(32,activation='relu'))
+model.add(Dense(64,activation='relu'))
+model.add(Dense(64,activation='relu'))
+model.add(Dense(32,activation='relu'))
+model.add(Dense(16,activation='relu'))
+# 데이터양 178개에 비해 128까지는 너무 많음, 조금씩 늘려가는가기
 
 model.add(Dense(3,activation='softmax')) # 출력층 
 
-model.compile(Adam(learning_rate=0.04),'categorical_crossentropy',metrics=['accuracy'])
+model.compile(Adam(learning_rate=0.001),'categorical_crossentropy',metrics=['accuracy'])
+#0.04 로할시 모델이 특정클래스만 찍어서 이상하게 나옴
 
 model.summary()
 
-model_history=model.fit(x=X_train, y=y_train, epochs=50, batch_size=32,validation_data= (X_test,y_test))
+model_history=model.fit(x=X_train, y=y_train, epochs=100, batch_size=16,validation_data= (X_test,y_test))
 # epoch : 몇번 반복해서 학습할지 
 # batch size : 데이터를 한번에 몇개씩 가져올건지 (보통은 16,32,64,128.. 로 실험)
 
@@ -92,7 +85,10 @@ plt.title('Training and validation accuracy')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.legend()
+# plt.savefig('wine_e1000_b16_lr0.001.jpg')
 plt.show()
 
 print(classification_report(y_test_class,y_pred_class))
 print(confusion_matrix(y_test_class,y_pred_class))
+
+# 정확도가 떨어질땐 random state, learning rate 확인
