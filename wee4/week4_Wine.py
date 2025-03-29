@@ -1,13 +1,15 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split #학습용 테스트용 나눌때 사용용
-from sklearn.tree import DecisionTreeClassifier #DTree
-from sklearn.ensemble import RandomForestClassifier #Randomforest
-from sklearn.svm import SVC #SVC
-from sklearn.linear_model import LogisticRegression #LR
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score #평가
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import LabelEncoder #라벨 인코딩용
 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.optimizers import SGD, Adam
+
+from sklearn.metrics import classification_report,confusion_matrix
+from sklearn.model_selection import train_test_split
 
 local = "C:/4-1/ML/week4/wine.csv"  
 local_df = pd.read_csv(local)
@@ -15,52 +17,82 @@ local_df = pd.read_csv(local)
 print(local_df.head())  # 첫 행 출력
 print(local_df.columns)  # 컬럼 이름 출력
 
-#결측치 채우기 이전----------
-print(local_df.isnull().mean())  # 각 열의 결측치 비율
+X=local_df.drop('Wine',axis=1)
+X.head() #미리보기기
 
-# drop 으로 필요없는 데이터 지우기
-# local_df.drop(columns=['Cabin'], inplace=True)
+y=local_df['Wine']
+y.value_counts() #빈도수
+y.head() #미리보기기
 
-# fillna() 로 결측치 매꾸기
-# local_df['Age'].fillna(local_df['Age'].mean(), inplace=True)
-# local_df['Embarked'].fillna(local_df['Embarked'].mode()[0], inplace=True)
+# 원핫 인코딩 전 데이터 (라벨 분포 보기)
+print("before one hot")
+print(y.head())
+print("y.shape:", y.shape)
+print("클래스 분포:\n", y.value_counts())
 
+# 원핫 인코딩딩
+Y = pd.get_dummies(y).values
+X = X.values
 
-encoder = LabelEncoder()
-for column in local_df.columns:
-    local_df[column] = encoder.fit_transform(local_df[column])
-    
-# for column in local_df.columns:
-#     print(local_df[column].value_counts())
+print("after one hot")
+print(Y[:5])        # .head() 대신 슬라이싱하기
+print("Y.shape:", Y.shape)
 
-#타겟
-tg='Wine'
-#필요 특성(up 2025-03-23)
-# ft=['buying','maintain','doors','person','lug','safety']
-ft = [col for col in local_df.columns if col != tg] 
+X_train,X_test, y_train,y_test = train_test_split(X,Y,test_size=0.2,random_state=0)
 
-x=local_df[ft]
-y=local_df[tg]
+model = Sequential() # 모델 시퀀셜
 
-#나눠주기
-x_train, x_test ,y_train, y_test = train_test_split(x,y,test_size=0.2, random_state=42)
+model.add(Dense(10,input_shape=(13,),activation='relu')) # 특징이 13개 이므로 input_shape 에 13개 넣기 
 
-#모델정의
-models = {
-    "Decision Tree": DecisionTreeClassifier(),
-    "Random Forest": RandomForestClassifier(),
-    "Logistic Regression": LogisticRegression(max_iter=1000),
-    "SVC": SVC()
-}
+model.add(Dense(50,activation='relu'))
 
-accuracy_results = {}
+model.add(Dense(100,activation='relu'))
 
-# 모델 학습습
-for name, model in models.items():
-    model.fit(x_train, y_train)  # 학습
-    y_pred = model.predict(x_test)  # 예측
-    acc = accuracy_score(y_test, y_pred)  # 정확도 계산
-    cm = confusion_matrix(y_test, y_pred)
-    accuracy_results[name] = acc
-    print(f"✅ {name} 정확도: {acc:.4f}")
-    print(f"📊 {name} Confusion Matrix:\n{cm}")
+# model.add(Dense(200,activation='relu'))
+
+# model.add(Dense(200,activation='relu'))
+# 200 까지 가니까 overfitting 발생 
+
+model.add(Dense(100,activation='relu'))
+
+model.add(Dense(50,activation='relu'))
+
+model.add(Dense(20,activation='relu'))
+
+model.add(Dense(3,activation='softmax')) # 출력층 
+
+model.compile(Adam(learning_rate=0.04),'categorical_crossentropy',metrics=['accuracy'])
+
+model.summary()
+
+model_history=model.fit(x=X_train, y=y_train, epochs=50, batch_size=32,validation_data= (X_test,y_test))
+# epoch : 몇번 반복해서 학습할지 
+# batch size : 데이터를 한번에 몇개씩 가져올건지 (보통은 16,32,64,128.. 로 실험)
+
+y_pred = model.predict(X_test)
+y_test_class = np.argmax(y_test,axis=1) 
+y_pred_class = np.argmax(y_pred,axis=1)
+loss =model_history.history['loss']
+val_loss =model_history.history['val_loss']
+epochs = range(1, len(loss) + 1)
+
+# plt.plot(epochs, loss, 'y', label='Training loss')
+# plt.plot(epochs, val_loss, 'r', label='Validation loss')
+# plt.title('Training and validation loss')
+# plt.xlabel('Epochs')
+# plt.ylabel('Loss')
+# plt.legend()
+# plt.show()
+
+acc =model_history.history['accuracy']
+val_acc =model_history.history['val_accuracy']
+plt.plot(epochs, acc, 'y', label='Training acc')
+plt.plot(epochs, val_acc, 'r', label='Validation acc')
+plt.title('Training and validation accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
+
+print(classification_report(y_test_class,y_pred_class))
+print(confusion_matrix(y_test_class,y_pred_class))
