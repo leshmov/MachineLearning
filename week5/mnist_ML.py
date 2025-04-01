@@ -15,19 +15,16 @@ digits = load_digits()
 X = digits.data               
 y = digits.target     
 
-# 변환하기기
-y_binary = (y == 0).astype(int)
-
 #분리
-X_train, X_test, y_train, y_test = train_test_split(X, y_binary, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 #shape 찍기
-print("X.shape:", X.shape)
-print("y_binary.shape:", y_binary.shape)
-print("X_train.shape:", X_train.shape)
-print("X_test.shape:", X_test.shape)
-print("y_train.shape:", y_train.shape)
-print("y_test.shape:", y_test.shape)
+# print("X.shape:", X.shape)
+# print("y_binary.shape:", y_binary.shape)
+# print("X_train.shape:", X_train.shape)
+# print("X_test.shape:", X_test.shape)
+# print("y_train.shape:", y_train.shape)
+# print("y_test.shape:", y_test.shape)
 
 #모델
 models = {
