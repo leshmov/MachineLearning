@@ -29,10 +29,8 @@ y=url_df['price']
 
 # # 원핫 인코딩딩
 # Y = pd.get_dummies(y).values
-# 회귀에선 필요없음 
 
 print("after one hot")
-print(y[:5])        # .head() 대신 슬라이싱하기
 print("Y.shape:", y.shape)
 print("X.shape:", X.shape)
 
