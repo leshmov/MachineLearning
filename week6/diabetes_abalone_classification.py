@@ -5,11 +5,11 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 
 import pandas as pd
 import numpy as np
-
+# MLP -------------------------------------------------
 # 데이터 로드 및 전처리
 data = pd.read_csv("C:/4-1/ML/week6/diabetes.csv")
 
@@ -36,6 +36,20 @@ y = data['Outcome'].values.astype(np.float32)
 
 scaler = StandardScaler()
 X = scaler.fit_transform(X)
+
+
+def split_sequences(sequences, n_steps):
+    X, y = [], []
+    for i in range(len(sequences) - n_steps + 1):
+        seq_x = sequences[i:i+n_steps, :-1]
+        seq_y = sequences[i+n_steps-1, -1]
+        X.append(seq_x)
+        y.append(seq_y)
+    return np.array(X), np.array(y)
+
+sequences = np.hstack((X, y.reshape(-1, 1)))  # X와 y를 합쳐서 split_sequences에 넣기
+X_seq, y_seq = split_sequences(sequences, n_steps=5)
+
 
 # xtrain, xtest = float32, ytrain, ytest = long
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -97,4 +111,6 @@ for epoch in range(epochs):
             labels.extend(yb.numpy())
     acc = accuracy_score(labels, preds)
     f1 = f1_score(labels, preds, average='weighted')
+    cm = confusion_matrix(labels, preds) 
     print(f"Epoch {epoch+1}, Acc: {acc:.4f}, F1: {f1:.4f}")
+    print("Confusion Matrix:\n", cm)       # ← 출력
