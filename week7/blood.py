@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
@@ -18,6 +20,13 @@ print("shape:", data.shape)
 print("BP_abnormal 분포 :")
 print(data['Blood_Pressure_Abnormality'].value_counts())
 print("전체 결측값 수:\n", data.isnull().sum())
+
+
+# 결측치 채우기 
+data['Genetic_Pedigree_Coefficient'] = data['Genetic_Pedigree_Coefficient'].fillna(data['Genetic_Pedigree_Coefficient'].mean())
+data['alcohol_consumption_per_day'] = data['alcohol_consumption_per_day'].fillna(data['alcohol_consumption_per_day'].mean())
+data['Pregnancy'] = data['Pregnancy'].fillna(0)
+
 
 label_encoders = {}
 for col in data.columns:
@@ -137,7 +146,7 @@ for epoch in range(epochs):
     f1 = f1_score(labels, preds, average='weighted')
     cm = confusion_matrix(labels, preds) 
     print(f"Epoch {epoch+1}, Acc: {acc:.4f}, F1: {f1:.4f}")
-    print("Confusion Matrix:\n", cm)       # ← 출력
+    print("Confusion Matrix:\n", cm) 
     
     if acc > best_acc:
         best_acc = acc
@@ -149,3 +158,49 @@ for epoch in range(epochs):
         if counter >= patience:
             print("⛔ Early stopping: accuracy not improving.")
             break
+        
+# corr = data.corr()
+
+plt.rcParams['font.family'] = 'Malgun Gothic'  # 한글 폰트
+plt.rcParams['axes.unicode_minus'] = False     # 마이너스 부호 깨짐 방지
+
+# plt.figure(figsize=(8, 6))
+# sns.boxplot(data=data, x='Sex', y='Age', hue='Blood_Pressure_Abnormality')
+# plt.title('성별에 따른 나이 분포 (혈압 이상 유무별)')
+# plt.xlabel('성별 (0: 남성, 1: 여성)')
+# plt.ylabel('나이')
+# plt.legend(title='혈압 이상 (0: 정상, 1: 이상)')
+# plt.tight_layout()
+# plt.show()
+
+# # 히트맵 그리기
+# plt.figure(figsize=(10, 8))
+# sns.heatmap(corr, annot=True, fmt=".2f", cmap='coolwarm', linewidths=0.5)
+# plt.title('변수 간 상관관계 히트맵')
+# plt.tight_layout()
+# plt.show()
+
+# plt.figure(figsize=(8, 5))
+# sns.histplot(data=data, x='BMI', bins=20, kde=True, hue='Blood_Pressure_Abnormality', multiple='stack')
+# plt.title('혈압 이상 여부에 따른 BMI 분포')
+# plt.xlabel('BMI')
+# plt.ylabel('빈도')
+# plt.tight_layout()
+# plt.show()
+
+# plt.figure(figsize=(8, 5))
+# sns.histplot(data=data, x='Age', bins=20, kde=True, hue='Blood_Pressure_Abnormality', multiple='stack')
+# plt.title('혈압 이상 여부에 따른 Age 분포')
+# plt.xlabel('Age')
+# plt.ylabel('빈도')
+# plt.tight_layout()
+# plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.scatterplot(data=data, x='BMI', y='Smoking', hue='Blood_Pressure_Abnormality', palette='Set1')
+plt.title('BMI와 흡연 여부에 따른 혈압 이상 분포')
+plt.xlabel('BMI')
+plt.ylabel('흡연 여부 (0: 비흡연, 1: 흡연)')
+plt.legend(title='혈압 이상 (0: 정상, 1: 이상)')
+plt.tight_layout()
+plt.show()
