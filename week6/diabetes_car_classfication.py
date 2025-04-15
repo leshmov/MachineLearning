@@ -5,11 +5,11 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 
 import pandas as pd
 import numpy as np
-
+# CNN ------------------------------------------------------
 # 데이터 로드, 확인 
 data = pd.read_csv("C:/4-1/ML/week6/diabetes.csv")
 
@@ -130,4 +130,6 @@ for epoch in range(epochs):
             labels.extend(yb.numpy())
     acc = accuracy_score(labels, preds)
     f1 = f1_score(labels, preds, average='weighted')
+    cm = confusion_matrix(labels, preds) 
     print(f"Epoch {epoch+1}, Acc: {acc:.4f}, F1: {f1:.4f}")
+    print("Confusion Matrix:\n", cm)       # ← 출력
