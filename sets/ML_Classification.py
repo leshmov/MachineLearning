@@ -22,7 +22,7 @@ local_df = pd.read_csv(local)
 
 print(" [전체 결측치 확인]")
 print(local_df.isnull().sum())
-print("\n📌 [데이터 크기]:", local_df.shape)
+print("\n [데이터 크기]:", local_df.shape)
 
 # for column in local_df.columns:
 #     print(local_df[column].value_counts())
@@ -71,4 +71,5 @@ for name, model in models.items():
 
 cm = confusion_matrix(y_test, y_pred)
 print("confusion \n",cm)
+
 
