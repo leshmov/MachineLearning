@@ -19,8 +19,8 @@ local_df = pd.read_csv(local)
 # #헤더 새로 추가해주기
 
 
-# 🔍 결측치 확인
-print("📌 [전체 결측치 확인]")
+
+print(" [전체 결측치 확인]")
 print(local_df.isnull().sum())
 print("\n📌 [데이터 크기]:", local_df.shape)
 
@@ -31,8 +31,8 @@ encoder = LabelEncoder()
 for column in local_df.columns:
     local_df[column] = encoder.fit_transform(local_df[column])
     
-# 🔍 인코딩 후 확인
-print("\n📌 [인코딩 후 데이터]")
+# 인코딩 후 확인
+print("\n [인코딩 후 데이터]")
 print(local_df.head())
 
 # for column in local_df.columns:
@@ -67,7 +67,8 @@ for name, model in models.items():
     y_pred = model.predict(x_test)  # 예측
     acc = accuracy_score(y_test, y_pred)  # 정확도 계산
     accuracy_results[name] = acc
-    print(f"✅ {name} 정확도: {acc:.4f}")
+    print(f" {name} 정확도: {acc:.4f}")
 
 cm = confusion_matrix(y_test, y_pred)
 print("confusion \n",cm)
+
